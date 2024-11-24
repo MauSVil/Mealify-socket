@@ -29,6 +29,10 @@ io.on('connection', (socket) => {
   });
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
 app.post('/api/new-order', async (req, res) => {
   try {
     const { order } = req.body;
