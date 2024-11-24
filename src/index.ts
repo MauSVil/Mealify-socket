@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { connectToDatabase } from './db';
@@ -29,11 +29,11 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-app.post('/api/new-order', async (req, res) => {
+app.post('/api/new-order', async (req: Request, res: Response) => {
   try {
     const { order } = req.body;
     const db = await connectToDatabase();
