@@ -23,6 +23,14 @@ io.on('connection', (socket) => {
 
   if (userId) usersLoggedIn[userId] = socket.id;
 
+  socket.on('order-took', async ({ order, userId }) => {
+    const db = await connectToDatabase();
+
+    await db.collection('orders').updateOne({ _id: new ObjectId(order._id) }, { $set: { status: 'taken' } });
+    await db.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { onHold: true } });
+    io.to(usersLoggedIn[order.user]).emit('order-update', order);
+  });
+
   socket.on('disconnect', () => {
     console.log('Un usuario se ha desconectado');
     delete usersLoggedIn[userId];
