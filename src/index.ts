@@ -18,8 +18,8 @@ const io = new Server(server, { cors: { origin: '*' }, pingInterval: 10000, ping
 const usersLoggedIn: Record<string, string> = {};
 
 io.on('connection', (socket) => {
-  const { token, userId } = socket.handshake.auth;
-  console.log('Un usuario se ha conectado', token, userId, socket.id);
+  const { token, userId, role } = socket.handshake.auth;
+  console.log('Un usuario se ha conectado', role, userId, socket.id);
 
   if (userId) usersLoggedIn[userId] = socket.id;
 
@@ -28,7 +28,11 @@ io.on('connection', (socket) => {
 
     await db.collection('orders').updateOne({ _id: new ObjectId(order._id) }, { $set: { status: 'taken' } });
     await db.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { onHold: true } });
-    io.to(usersLoggedIn[order.user]).emit('order-update', order);
+
+    io.to(usersLoggedIn[order.user]).emit('order-update', {
+      ...order,
+      status: 'taken',
+    });
   });
 
   socket.on('disconnect', () => {
