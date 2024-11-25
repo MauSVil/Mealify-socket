@@ -61,7 +61,7 @@ app.post('/api/new-order', async (req: Request, res: Response) => {
 
     orderFound.restaurant = restaurantFound;
 
-    const deliveryUsers = await db.collection('users').find({ role: 'delivery', active: true }).toArray();
+    const deliveryUsers = await db.collection('users').find({ role: 'delivery', active: true, onHold: false }).toArray();
 
     for (const user of deliveryUsers) {
       const { _id } = user;
