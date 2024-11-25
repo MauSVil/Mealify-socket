@@ -7,7 +7,7 @@ export const connectToDatabase = async () => {
         return db;
     }
 
-    const uri = process.env.MONGO_URI || 'mongodb+srv://maudev96:root@develop.u8ux4sw.mongodb.net/?retryWrites=true&w=majority&appName=Develop';
+    const uri = process.env.MONGO_URI!;
     const client = new MongoClient(uri);
 
     try {
