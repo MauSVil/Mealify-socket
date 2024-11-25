@@ -13,7 +13,7 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const io = new Server(server, { cors: { origin: '*'}, pingInterval: 10000, pingTimeout: 5000 });
+const io = new Server(server, { cors: { origin: '*' }, pingInterval: 10000, pingTimeout: 5000 });
 
 const usersLoggedIn: Record<string, string> = {};
 
@@ -44,8 +44,17 @@ app.post('/api/new-order', async (req: Request, res: Response) => {
       return;
     }
 
+    const restaurantFound = await db.collection('businesses').findOne({ _id: new ObjectId(orderFound.restaurant) });
+
+    if (!restaurantFound) {
+      res.status(404).json({ error: 'No se ha encontrado el restaurante' });
+      return;
+    }
+
+    orderFound.restaurant = restaurantFound;
+
     const deliveryUsers = await db.collection('users').find({ role: 'delivery', active: true }).toArray();
-    
+
     for (const user of deliveryUsers) {
       const { _id } = user;
       io.to(usersLoggedIn[_id.toString()]).emit('new-order', orderFound);
@@ -60,5 +69,5 @@ app.post('/api/new-order', async (req: Request, res: Response) => {
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
